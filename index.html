@@ -1,0 +1,96 @@
+<html>
+<head>
+	<style>
+
+		body {
+			margin: 0px;
+			padding: 0px;
+		}
+
+	</style>
+
+	<script src="client/Keyboard.js"></script>
+	<script src="client/Weapon.js"></script>
+	<script src="client/Ship.js"></script>
+	<script src="client/Army.js"></script>
+	<script src="client/Player.js"></script>
+	<script src="client/requestAnimFrame.js"></script>
+	<script src="socket.io.min.js"></script>
+	<script src="client/stats.js"></script>
+</head>
+<body>
+
+	<canvas id="myCanvas"></canvas>
+
+	<script>
+
+		//stats thing
+		var stats = new Stats();
+	    stats.setMode(0);
+	    stats.domElement.style.position = 'absolute';
+	    stats.domElement.style.left = '0px';
+	    stats.domElement.style.top = '0px';
+	    document.body.appendChild(stats.domElement);
+	    var username = prompt("Enter your username: ") || "Anonymous";
+	    var socket = io.connect('http://localhost:4242');
+		var canvas = document.getElementById("myCanvas");
+		canvas.style.backgroundColor = 'black';
+		var context = canvas.getContext('2d');
+		var kb = new KeyboardJS(true);
+
+		var weapons = {};
+		var ships = {};
+		var armys = {};
+
+		//So that the camera gets centered
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+
+
+
+
+		
+
+		socket.on('connect', function () {
+			socket.id = socket.socket.sessionid;
+			socket.emit('userConnected', username);
+		});
+
+		var weapon = new Weapon("test", 10 20 30);
+		
+		socket.emit('donaWeapon', weapon);
+
+
+		function logic (dt) {
+
+		}
+
+		function render (ctx) {
+			ctx.clearRect(0,0, canvas.width, canvas.height);
+			
+		}
+		
+
+		window.onresize = function () {
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			render(context);
+		}
+		window.onresize();
+
+		var oldDate = +new Date();
+		function mainLoop () {
+			requestAnimFrame(mainLoop);
+			stats.begin();
+			var newDate = +new Date();
+			var delta = newDate - oldDate;
+			oldDate = newDate;
+			logic(delta);
+			render(context);
+			stats.end();
+		}
+		requestAnimFrame(mainLoop);
+
+	</script>
+
+</body>
