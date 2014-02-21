@@ -27,19 +27,28 @@ function Army(name, ships){
 
 function Player(user, id){
 	this.id = id;
+	this.game = undefined;
 	this.user = user;
-	this.weapons = undefined;
-	this.ships = undefined;
-	this.armys = undefined;
+	this.weapons = {};
+	this.ships = {};
+	this.armys = {};
+}
+
+function Game(id, pl1, pl2){
+	this.player1=pl1;
+	this.player2=pl2;
+	this.id=id;
 }
 
 var players = {};
+var games = {};
 
 
 io.sockets.on('connection', function (socket) {
 	socket.on('userConnected', function (username) {
 		var player = new Player (username, socket.id);
 		players[socket.id] = player;
+		socket.emit('userRegistered');
 	});
 
 	socket.on('donaWeapon', function (weapon){
